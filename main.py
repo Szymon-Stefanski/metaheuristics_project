@@ -11,9 +11,18 @@ max = 4
 
 
 def goal(arr, limit):
-    for i in range(len(arr)-1):
-        if arr[i].get("weight") <= limit:
-            return [arr[i].get("price") + arr[i].get("weight") for i in range(len(arr)-1)]
+    totals = [arr[i].get("price") + arr[i].get("weight") for i in range(len(arr))]
+
+    perms = []
+
+    for i in range(len(totals)):
+        for j in range(len(totals)):
+            if totals[i] != totals[j]:
+                print(totals[i],totals[j])
+                if (totals[i]+totals[j]):
+                    perms.append(totals[i]+totals[j])
+
+    print(perms)
 
 
 def nearest_neighbour(arr):
@@ -26,6 +35,6 @@ def random_solution(arr):
 
 
 
-print(goal(goods,max))
+goal(goods,max)
 print(nearest_neighbour(goods))
 
