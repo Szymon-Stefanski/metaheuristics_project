@@ -9,20 +9,19 @@ goods = [{ "name" : "guitar", "price" : 500, "weight" : 4},
 
 max = 4
 
+permuts = []
+
+knapsack = []
 
 def goal(arr, limit):
-    totals = [arr[i].get("price") + arr[i].get("weight") for i in range(len(arr))]
+    for i in range(len(arr)):
+        for j in range(len(arr)-1):
+            if (arr[i].get("name") != arr[j+1].get("name")) and (arr[i].get("weight") + arr[j+1].get("weight")) <= limit:
+                permuts.append({"name":arr[i].get("name") + " , " + arr[j+1].get("name"),
+                                "price":arr[i].get("price") + arr[j+1].get("price"),
+                                "weight":arr[i].get("weight") + arr[j+1].get("weight")})
 
-    perms = []
-
-    for i in range(len(totals)):
-        for j in range(len(totals)):
-            if totals[i] != totals[j]:
-                print(totals[i],totals[j])
-                if (totals[i]+totals[j]):
-                    perms.append(totals[i]+totals[j])
-
-    print(perms)
+    return permuts
 
 
 def nearest_neighbour(arr):
@@ -34,7 +33,6 @@ def random_solution(arr):
     return 0
 
 
-
-goal(goods,max)
-print(nearest_neighbour(goods))
+print(goal(goods,max))
+#print(nearest_neighbour(goods))
 
