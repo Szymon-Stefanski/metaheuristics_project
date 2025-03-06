@@ -1,31 +1,31 @@
+import random
 
 
 def goal(arrays, target, limit):
-    for i in range(len(arrays)):
-        arrays[i]['name'] = " ".join(sorted(arrays[i]['name'].split()))
-
-        if arrays[i].get("weight") == limit:
-            target.append(arrays[i])
-            arrays.remove(arrays[i])
+    permuts = arrays.copy()
+    for i in range(len(permuts)):
+        if permuts[i].get("weight") == limit:
+            target.append(permuts[i])
+            permuts.remove(permuts[i])
             target.sort(key=lambda x: x["price"], reverse=True)
 
-        elif arrays[i].get("weight") < limit:
-            for j in range(len(arrays)):
-                while (arrays[j].get("weight") + arrays[i].get("weight")) <= limit:
-                    if arrays[i].get("name") not in arrays[j].get("name"):
-                        arrays.append({"name" : arrays[i].get("name") + " " + arrays[j].get("name"),
-                                      "price" : arrays[i].get("price") + arrays[j].get("price"),
-                                      "weight" : arrays[i].get("weight") + arrays[j].get("weight")})
+        elif permuts[i].get("weight") < limit:
+            for j in range(len(permuts)):
+                while (permuts[j].get("weight") + permuts[i].get("weight")) <= limit:
+                    if permuts[i].get("name") not in permuts[j].get("name"):
+                        permuts.append({"name" : permuts[i].get("name") + " " + permuts[j].get("name"),
+                                      "price" : permuts[i].get("price") + permuts[j].get("price"),
+                                      "weight" : permuts[i].get("weight") + permuts[j].get("weight")})
                     break
 
-    arrays.sort(key=lambda x: x["price"], reverse=True)
+    permuts.sort(key=lambda x: x["price"], reverse=True)
 
-    for n in range(len(arrays) - 1, -1, -1):
-        arrays[n]['name'] = " ".join(sorted(arrays[n]['name'].split()))
-        if arrays[n].get("weight") != limit:
-            del arrays[n]
+    for n in range(len(permuts) - 1, -1, -1):
+        permuts[n]['name'] = " ".join(sorted(permuts[n]['name'].split()))
+        if permuts[n].get("weight") != limit:
+            del permuts[n]
         else:
-            target.append(arrays[n])
+            target.append(permuts[n])
 
     target = [dict(t) for t in {tuple(d.items()) for d in target}]
     target.sort(key=lambda x: x["price"], reverse=True)
@@ -40,12 +40,19 @@ def goal(arrays, target, limit):
 
 
 def nearest_neighbour(arr):
-    print("\nNearest neighbour:")
+    print("\nNearest neighbours of items in goods:")
     return [arr[i].get("name") + "," + arr[i + 1].get("name") for i in range(len(arr) - 1)]
 
 
-def random_solution(arr):
-    return 0
+def random_solution(array):
+    knapsack_random = []
+    new_array = array.copy()
+    for i in range(len(new_array)):
+        new_array[i].update({"price" : int(random.random()*100)})
+        new_array[i].update({"weight" : int(random.random()*100)})
+    result = goal(new_array, knapsack_random, int(random.random() * 100))
+    print("Random solution:")
+    return result
 
 
 goods = [{ "name" : "guitar", "price" : 500, "weight" : 4},
@@ -62,3 +69,4 @@ knapsack = []
 
 print(nearest_neighbour(goods))
 print(goal(goods, knapsack,3))
+print(random_solution(goods))
