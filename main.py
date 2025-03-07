@@ -2,6 +2,30 @@ import random
 
 
 def goal(arrays, target, limit):
+    if len(arrays) < 1:
+        option=None
+        while option != 3:
+            option = input("\nChoose an option: :"
+                           "\n1. Add item."
+                           "\n2. Show items."
+                           "\n3. Complete task.\n")
+            if option == "1":
+                name = input("Insert item's name:")
+                price = input("Insert item's price:")
+                weight = input("Insert item's weight:")
+                arrays.append({"name" : name, "price" : int(price), "weight" : int(weight)})
+            elif option == "2":
+                if len(arrays) > 0:
+                    for item in arrays:
+                        print(item)
+                else:
+                    print("There is no items!")
+            elif option == "3":
+                break
+            else:
+                print("Invalid option! Please try again!")
+                continue
+
     permuts = arrays.copy()
     for i in range(len(permuts)):
         if permuts[i].get("weight") == limit:
@@ -55,15 +79,10 @@ def random_solution(array):
     return result
 
 
-goods = [{ "name" : "guitar", "price" : 500, "weight" : 4},
-         { "name" : "violin", "price" : 900, "weight" : 2},
-         { "name" : "monitor", "price" : 1000, "weight" : 3},
-         { "name" : "laptop", "price" : 1500, "weight" : 4},
-         { "name" : "watch", "price" : 700, "weight" : 1},
-         { "name" : "phone", "price" : 600, "weight" : 1},
-         ]
-
-
+goods = [{"name" : "guitar", "price" : 500, "weight" : 3},
+         {"name" : "laptop", "price" : 1000, "weight" : 1},
+         {"name" : "phone", "price" : 500, "weight" : 1},
+         {"name" : "tablet", "price" : 1000, "weight" : 1}]
 knapsack = []
 
 
