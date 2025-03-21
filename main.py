@@ -34,7 +34,9 @@ class Knapsack():
                     print("Invalid option! Please try again!")
                     continue
 
-    def goal(self, limit):
+
+    def goal(self, array = None, target = None, limit = None):
+        limit = int(input("Insert item's weight limit:"))
         permuts = self.arrays.copy()
         for i in range(len(permuts)):
             if permuts[i].get("weight") == limit:
@@ -60,21 +62,21 @@ class Knapsack():
             else:
                 self.bag.append(permuts[n])
 
-        target = [dict(t) for t in {tuple(d.items()) for d in self.bag}]
-        target.sort(key=lambda x: x["price"], reverse=True)
+        self.bag = [dict(t) for t in {tuple(d.items()) for d in self.bag}]
+        self.bag.sort(key=lambda x: x["price"], reverse=True)
 
 
-        for m in range(len(target) - 1, -1, -1):
-            if target[m].get("price") < target[0].get("price"):
-                del target[m]
+        for m in range(len(self.bag) - 1, -1, -1):
+            if self.bag[m].get("price") < self.bag[0].get("price"):
+                del self.bag[m]
 
-        print("\nKnapsack possible items: ")
-        return print(target)
+        return print("\nKnapsack possible items:", self.bag)
 
 
     def nearest_neighbour(self):
-        print("\nNearest neighbours of items in goods:")
-        return [self.arrays[i].get("name") + "," + self.arrays[i + 1].get("name") for i in range(len(self.arrays) - 1)]
+        return print("\nNearest neighbours of items in goods:",
+                     [self.arrays[i].get("name") + "," +
+                      self.arrays[i + 1].get("name") for i in range(len(self.arrays) - 1)])
 
 
     def random_solution(self):
@@ -83,10 +85,11 @@ class Knapsack():
         for i in range(len(new_array)):
             new_array[i].update({"price" : int(random.random()*100)})
             new_array[i].update({"weight" : int(random.random()*100)})
-        result = self.arrays.goal(new_array, knapsack_random, int(random.random() * 100))
-        print("Random solution:")
-        return result
+
+        return print("\nRandom solution:" + self.goal(new_array, knapsack_random, int(random.random() * 100)))
 
 
 knapsack = Knapsack()
-knapsack.goal(2)
+knapsack.goal()
+knapsack.nearest_neighbour()
+knapsack.random_solution()
