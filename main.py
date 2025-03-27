@@ -1,5 +1,5 @@
 import random
-
+import csv
 
 class Knapsack():
     def __init__(self, arrays=None):
@@ -14,22 +14,40 @@ class Knapsack():
             option = None
             while option != 3:
                 option = input("\nChoose an option: :"
+                               "\n0. Import data from file (.csv data type)"
                                "\n1. Add item."
                                "\n2. Show items."
                                "\n3. Complete task.\n")
-                if option == "1":
+
+                if option == "0":
+                    path = input("\nEnter path to file: ")
+                    with open(path, "r") as file:
+                        reader = csv.DictReader(file)
+                        for row in reader:
+                            self.bag.append({
+                                "name": row["name"],
+                                "price": int(row["price"]),
+                                "weight": int(row["weight"]),
+                            })
+                    print(self.bag)
+                    break
+
+                elif option == "1":
                     name = input("Insert item's name:")
                     price = input("Insert item's price:")
                     weight = input("Insert item's weight:")
                     self.arrays.append({"name": name, "price": int(price), "weight": int(weight)})
+
                 elif option == "2":
                     if len(self.arrays) > 0:
                         for item in self.arrays:
                             print(item)
                     else:
                         print("There is no items!")
+
                 elif option == "3":
                     break
+
                 else:
                     print("Invalid option! Please try again!")
                     continue
