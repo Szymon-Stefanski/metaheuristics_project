@@ -1,19 +1,18 @@
 import random
 import csv
-from random import randint
 
 
 goods = [{"name" : "guitar", "price" : 500, "weight" : 3},
          {"name" : "laptop", "price" : 1000, "weight" : 2},
          {"name" : "phone", "price" : 500, "weight" : 1},
-         {"name" : "tablet", "price" : 1000, "weight" : 1}]
+         {"name" : "tablet", "price" : 1000, "weight" : 1},
+         {"name" : "tv", "price" : 3000, "weight" : 5}]
 
-knapsack = []
 weight = 4
 
-def goal(arrays=None, target=None, limit=None):
-    if len(arrays) < 1:
-        option=None
+def no_items(array):
+    if array is None:
+        option = None
         while option != 3:
             option = input("\nChoose an option: :"
                            "\n0. Import data from a file (.csv)"
@@ -26,20 +25,20 @@ def goal(arrays=None, target=None, limit=None):
                     bag = []
                     path = input("\nEnter path to file: ")
                     with open(path, "r") as file:
-                     reader = csv.DictReader(file)
-                     for row in reader:
-                         bag.append({
-                             "name": row["name"],
-                             "price": int(row["price"]),
-                             "weight": int(row["weight"]),
-                         })
+                        reader = csv.DictReader(file)
+                        for row in reader:
+                            bag.append({
+                                "name": row["name"],
+                                "price": int(row["price"]),
+                                "weight": int(row["weight"]),
+                            })
                     arrays = bag.copy()
 
                 case 1:
                     name = input("Insert item's name:")
                     price = input("Insert item's price:")
                     weight = input("Insert item's weight:")
-                    arrays.append({"name" : name, "price" : int(price), "weight" : int(weight)})
+                    arrays.append({"name": name, "price": int(price), "weight": int(weight)})
 
                 case 2:
                     if len(arrays) > 0:
@@ -54,13 +53,24 @@ def goal(arrays=None, target=None, limit=None):
                 case _:
                     print("Invalid option! Please try again!")
                     continue
+        return array
 
-    permuts = arrays.copy()
+
+def goal(array=None, limit=None):
+    knapsack = []
+
+    if limit < 0:
+        limit = input("Please enter weight limit")
+
+    if array is None:
+        no_items(array)
+
+    permuts = array.copy()
     for i in range(len(permuts)-1):
         if permuts[i].get("weight") == limit:
-            target.append(permuts[i])
+            knapsack.append(permuts[i])
             permuts.remove(permuts[i])
-            target.sort(key=lambda x: x["price"], reverse=True)
+            knapsack.sort(key=lambda x: x["price"], reverse=True)
 
         elif permuts[i].get("weight") < limit:
             for j in range(len(permuts)):
@@ -78,47 +88,65 @@ def goal(arrays=None, target=None, limit=None):
         if permuts[n].get("weight") != limit:
             del permuts[n]
         else:
-            target.append(permuts[n])
+            knapsack.append(permuts[n])
 
-    target = [dict(t) for t in {tuple(d.items()) for d in target}]
-    target.sort(key=lambda x: x["price"], reverse=True)
+    knapsack = [dict(t) for t in {tuple(d.items()) for d in knapsack}]
+    knapsack.sort(key=lambda x: x["price"], reverse=True)
 
 
-    for m in range(len(target) - 1, -1, -1):
-        if target[m].get("price") < target[0].get("price"):
-            del target[m]
+    for m in range(len(knapsack) - 1, -1, -1):
+        if knapsack[m].get("price") < knapsack[0].get("price"):
+            del knapsack[m]
 
     print(f"\nKnapsack best possible items configuration with weight limit = {limit} :")
-    return target
+    return knapsack
 
 
-def nearest_neighbour(arr):
-    print("\nItems:")
-    print(arr)
-    print("\nNearest neighbours of items in goods:")
-    return [arr[i].get("name") + "," + arr[i + 1].get("name") for i in range(len(arr) - 1)]
+def nearest_neighbour(array=None):
+    if array is None:
+        no_items(array)
+
+    neighbours = []
+
+    for i in range(len(array)):
+        neighbour = array.copy()
+        neighbour[(i+1) % len(array)],neighbour[i] = array[i],array[(i+1) % len(array)]
+        neighbours.append(neighbour)
+
+    return neighbours
 
 
-def random_solution(array):
-    knapsack_random = []
-    new_array = array.copy()
-    for i in range(len(new_array)):
-        max_weight = randint(1,5)
-        new_array[i].update({"price" : round(int(random.randint(100,10000)),-2)})
-        new_array[i].update({"weight" : int(random.randint(1,max_weight))})
-    result = goal(new_array, knapsack_random, int(random.randint(1,6)))
-    print("Random items - random prices and weights: ")
-    print(new_array)
-    print("Random solution:")
-    return result
+# In progress
+"""
+def random_solution(array, limit):
+    if array is None:
+        no_items(array)
+
+    knapsack = []
+
+    current = array.copy()
+    random.shuffle(current)
 
 
-#Create table with dictionaries for example: x = [{"name":"laptop", "price":3000, "weight":2},
-#                                                 {"name":"phone", "price":1500, "weight":1}]
-#Create knapsack table - knapsack = []
-#
-#Set limit for example: weight = 5
+    print(f"Random solution for weight limit = {limit} :")
+    return knapsack
+"""
+
+
+# In progress
+"""
+def hill_climbing(array, iterations):
+    current = random_solution(array)
+    neighbours = nearest_neighbour(array)
+    best_neighbour = neighbours[0]
+
+    print("\nHill climbing algorithm result:")
+    return best_neighbour
+
+"""
+
 
 print(nearest_neighbour(goods))
-print(goal(goods, knapsack, weight))
-print(random_solution(goods))
+print(goal(goods, weight))
+#print(random_solution(goods, 4))
+#print(hill_climbing(goods, 3))
