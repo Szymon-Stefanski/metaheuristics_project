@@ -116,21 +116,30 @@ def nearest_neighbour(array=None):
     return neighbours
 
 
-# In progress
-"""
+
 def random_solution(array, limit):
     if array is None:
-        no_items(array)
+        raise ValueError("Item list cannot be None")
+
+    print("\n")
 
     knapsack = []
+    total_weight = 0
 
     current = array.copy()
     random.shuffle(current)
 
+    for item in current:
+        knapsack.append({"name" : item["name"], "price" : item["price"], "weight" : item["weight"]})
+        total_weight += item["weight"]
 
-    print(f"Random solution for weight limit = {limit} :")
+        if total_weight >= limit:
+            break
+
+    print(f"Random solution for weight limit = {limit}:")
+
     return knapsack
-"""
+
 
 
 # In progress
@@ -148,5 +157,5 @@ def hill_climbing(array, iterations):
 
 print(nearest_neighbour(goods))
 print(goal(goods, weight))
-#print(random_solution(goods, 4))
+print(random_solution(goods, 4))
 #print(hill_climbing(goods, 3))
