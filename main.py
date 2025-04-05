@@ -2,7 +2,7 @@ import random
 import csv
 
 
-goods = [{"name" : "guitar", "price" : 500, "weight" : 3},
+items = [{"name" : "guitar", "price" : 500, "weight" : 3},
          {"name" : "laptop", "price" : 1000, "weight" : 2},
          {"name" : "phone", "price" : 500, "weight" : 1},
          {"name" : "tablet", "price" : 1000, "weight" : 1},
@@ -10,20 +10,23 @@ goods = [{"name" : "guitar", "price" : 500, "weight" : 3},
 
 weight = 5
 
+
 def no_items(array):
     if array is None:
-        option = None
-        while option != 3:
-            option = input("\nChoose an option: :"
-                           "\n0. Import data from a file (.csv)"
-                           "\n1. Add item."
-                           "\n2. Show items."
-                           "\n3. Complete task.\n")
+        array = []
 
-            match option:
-                case 0:
-                    bag = []
-                    path = input("\nEnter path to file: ")
+    while True:
+        option = input("\nChoose an option:"
+                       "\n0. Import data from a file (.csv)"
+                       "\n1. Add item."
+                       "\n2. Show items."
+                       "\n3. Complete task.\n")
+
+        match option:
+            case "0":
+                bag = []
+                path = input("\nEnter path to file: ")
+                try:
                     with open(path, "r") as file:
                         reader = csv.DictReader(file)
                         for row in reader:
@@ -32,28 +35,34 @@ def no_items(array):
                                 "price": int(row["price"]),
                                 "weight": int(row["weight"]),
                             })
-                    arrays = bag.copy()
+                    array.extend(bag)
+                    print("Items successfully imported.")
+                except FileNotFoundError:
+                    print("File not found! Please try again.")
 
-                case 1:
-                    name = input("Insert item's name:")
-                    price = input("Insert item's price:")
-                    weight = input("Insert item's weight:")
-                    arrays.append({"name": name, "price": int(price), "weight": int(weight)})
+            case "1":
+                name = input("Insert item's name: ")
+                price = input("Insert item's price: ")
+                weight = input("Insert item's weight: ")
+                array.append({"name": name, "price": int(price), "weight": int(weight)})
 
-                case 2:
-                    if len(arrays) > 0:
-                        for item in arrays:
-                            print(item)
-                    else:
-                        print("There is no items!")
+            case "2":
+                if array:
+                    print("\nCurrent items:")
+                    for item in array:
+                        print(item)
+                else:
+                    print("There are no items!")
 
-                case 3:
-                    break
+            case "3":
+                print("Finished item input.")
+                return array
 
-                case _:
-                    print("Invalid option! Please try again!")
-                    continue
-        return array
+            case _:
+                print("Invalid option! Please try again.")
+
+    return array
+
 
 
 def goal(array=None, limit=None):
@@ -104,9 +113,9 @@ def goal(array=None, limit=None):
 
 def nearest_neighbour(array=None):
     if array is None:
-        no_items(array)
+        array = no_items(array)
 
-    neighbours = []
+    neighbours = array.copy()
 
     for i in range(len(array)):
         neighbour = array.copy()
@@ -114,7 +123,6 @@ def nearest_neighbour(array=None):
         neighbours.append(neighbour)
 
     return neighbours
-
 
 
 def random_solution(array, limit):
@@ -160,7 +168,7 @@ def hill_climbing(array, iterations):
 """
 
 
-print(nearest_neighbour(goods))
-print(goal(goods, weight))
-print(random_solution(goods, 5))
-#print(hill_climbing(goods, 3))
+print(nearest_neighbour(items))
+print(goal(items, weight))
+print(random_solution(items, 5))
+#print(hill_climbing(items, 3))
