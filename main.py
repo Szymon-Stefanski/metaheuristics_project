@@ -11,6 +11,7 @@ items = [{"name" : "guitar", "price" : 500, "weight" : 3},
 weight = 5
 
 
+# Function to create array or import from data file function
 def no_items(array):
     if array is None:
         array = []
@@ -64,7 +65,7 @@ def no_items(array):
     return array
 
 
-
+# Knapsack problem solution function
 def goal(array=None, limit=None):
     knapsack = []
 
@@ -111,20 +112,22 @@ def goal(array=None, limit=None):
     return knapsack
 
 
+# Nearest neighbour function
 def nearest_neighbour(array=None):
     if array is None:
         array = no_items(array)
 
-    neighbours = array.copy()
+    neighbours = []
 
     for i in range(len(array)):
         neighbour = array.copy()
-        neighbour[(i+1) % len(array)],neighbour[i] = array[i],array[(i+1) % len(array)]
+        neighbour[i], neighbour[(i+1) % len(array)] = neighbour[(i+1) % len(array)], neighbour[i]
         neighbours.append(neighbour)
 
     return neighbours
 
 
+# Random solution function
 def random_solution(array, limit):
     if not array:
         no_items(array)
@@ -154,21 +157,45 @@ def random_solution(array, limit):
     return knapsack
 
 
+# Hill climbing solution
+def hill_climbing(array, iterations, limit):
+    current = random_solution(array, limit)
+    best = current
 
-# In progress
-"""
-def hill_climbing(array, iterations):
-    current = random_solution(array)
-    neighbours = nearest_neighbour(array)
-    best_neighbour = neighbours[0]
+    for _ in range(iterations):
+        neighbours = nearest_neighbour(array)
 
-    print("\nHill climbing algorithm result:")
-    return best_neighbour
+        improved = False
+        for neighbour in neighbours:
+            total_weight = 0
+            total_price = 0
+            selected_names = []
 
-"""
+            for item in neighbour:
+                if total_weight + item["weight"] <= limit:
+                    total_weight += item["weight"]
+                    total_price += item["price"]
+                    selected_names.append(item["name"])
+
+            neighbour_solution = {
+                "name": " ".join(sorted(selected_names)),
+                "price": total_price,
+                "weight": total_weight
+            }
+
+            if neighbour_solution["price"] > best["price"]:
+                best = neighbour_solution
+                improved = True
+
+        if not improved:
+            break
+
+    print(f"\nHill climbing result for weight limit = {limit}:")
+    return best
+
 
 
 print(nearest_neighbour(items))
 print(goal(items, weight))
 print(random_solution(items, 5))
-#print(hill_climbing(items, 3))
+print(hill_climbing(items, 10, 5))
