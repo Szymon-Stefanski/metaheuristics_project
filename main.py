@@ -1,5 +1,6 @@
 import random
 import csv
+import math
 
 
 items = [{"name" : "guitar", "price" : 500, "weight" : 3},
@@ -195,7 +196,51 @@ def hill_climbing(array, iterations, limit):
 
 
 
+# Simulated annealing solution
+def simulated_annealing(array, limit, initial_temp=1000, cooling_rate=0.95, min_temp=1):
+    if not array:
+        array = no_items(array)
+
+    current = random_solution(array, limit)
+    best = current
+    temperature = initial_temp
+
+    while temperature > min_temp:
+        neighbour_items = nearest_neighbour(array)
+        next_candidate = random.choice(neighbour_items)
+
+        total_weight = 0
+        total_price = 0
+        selected_names = []
+
+        for item in next_candidate:
+            if total_weight + item["weight"] <= limit:
+                total_weight += item["weight"]
+                total_price += item["price"]
+                selected_names.append(item["name"])
+
+        candidate_solution = {
+            "name": " ".join(sorted(selected_names)),
+            "price": total_price,
+            "weight": total_weight
+        }
+
+        delta = candidate_solution["price"] - current["price"]
+
+        if delta > 0 or random.random() < math.exp(delta / temperature):
+            current = candidate_solution
+
+        if current["price"] > best["price"]:
+            best = current
+
+        temperature *= cooling_rate
+
+    print(f"\nSimulated Annealing result for weight limit = {limit}:")
+    return best
+
+
 print(nearest_neighbour(items))
 print(goal(items, weight))
 print(random_solution(items, 5))
 print(hill_climbing(items, 10, 5))
+print(simulated_annealing(items, 5))
