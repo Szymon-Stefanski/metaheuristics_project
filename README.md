@@ -17,6 +17,11 @@ It serves both as a learning exercise in optimization algorithms and as a practi
 - **Hill Climbing**  
   Starts from an initial solution and iteratively makes small improvements to reach a local optimum.
   
+- **Simulated Annealing**
+
+  A probabilistic metaheuristic that explores the solution space by occasionally accepting worse solutions, 
+  allowing it to escape local optima. Gradually reduces its acceptance rate by lowering a "temperature" 
+  parameter over time.
 
 ## 🧠 Project Focus
 
