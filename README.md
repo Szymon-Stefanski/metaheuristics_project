@@ -23,6 +23,11 @@ It serves both as a learning exercise in optimization algorithms and as a practi
   allowing it to escape local optima. Gradually reduces its acceptance rate by lowering a "temperature" 
   parameter over time.
 
+- **Tabu Search**  
+  A local search metaheuristic that uses memory structures to avoid revisiting recent solutions (tabu list).  
+  It explores neighboring solutions while keeping track of recently visited states to escape local optima.  
+  Optionally supports backtracking to the last promising solution if no valid neighbors are found.
+
 ## 🧠 Project Focus
 
 - Experiment with different metaheuristic optimization techniques
