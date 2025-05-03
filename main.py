@@ -239,8 +239,66 @@ def simulated_annealing(array, limit, initial_temp=1000, cooling_rate=0.95, min_
     return best
 
 
+# Tabu Search algorithm
+def tabu_search(array, limit, iterations=100, tabu_size=5):
+    if not array:
+        array = no_items(array)
+
+    current = random_solution(array, limit)
+    best = current
+    tabu_list = []
+    history = [current]
+
+    for _ in range(iterations):
+        neighbours = nearest_neighbour(array)
+        candidates = []
+
+        for neighbour in neighbours:
+            total_weight = 0
+            total_price = 0
+            selected_names = []
+
+            for item in neighbour:
+                if total_weight + item["weight"] <= limit:
+                    total_weight += item["weight"]
+                    total_price += item["price"]
+                    selected_names.append(item["name"])
+
+            candidate_solution = {
+                "name": " ".join(sorted(selected_names)),
+                "price": total_price,
+                "weight": total_weight
+            }
+
+            if candidate_solution["name"] not in tabu_list:
+                candidates.append(candidate_solution)
+
+        if not candidates:
+            if history:
+                current = history.pop()
+                continue
+            else:
+                break
+
+        next_solution = max(candidates, key=lambda x: x["price"])
+
+        tabu_list.append(next_solution["name"])
+        if len(tabu_list) > tabu_size:
+            tabu_list.pop(0)
+
+        history.append(current)
+        current = next_solution
+
+        if current["price"] > best["price"]:
+            best = current
+
+    print(f"\nTabu Search result for weight limit = {limit}, tabu size = {tabu_size}:")
+    return best
+
+
 print(nearest_neighbour(items))
 print(goal(items, weight))
 print(random_solution(items, 5))
 print(hill_climbing(items, 10, 5))
 print(simulated_annealing(items, 5))
+print(tabu_search(items, 5, iterations=50, tabu_size=5))
