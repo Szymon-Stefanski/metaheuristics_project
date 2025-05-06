@@ -1,6 +1,7 @@
 import random
 import csv
 import math
+import itertools
 
 
 items = [{"name" : "guitar", "price" : 500, "weight" : 3},
@@ -158,6 +159,35 @@ def random_solution(array, limit):
     return knapsack
 
 
+# Brute force algorithm
+def brute_force_knapsack(array, limit):
+    if not array:
+        array = no_items(array)
+
+    best_combination = []
+    best_value = 0
+    best_weight = 0
+
+    for r in range(1, len(array) + 1):
+        for combination in itertools.combinations(array, r):
+            total_weight = sum(item["weight"] for item in combination)
+            total_price = sum(item["price"] for item in combination)
+
+            if total_weight <= limit and total_price > best_value:
+                best_value = total_price
+                best_weight = total_weight
+                best_combination = combination
+
+    result = {
+        "name": " ".join(sorted(item["name"] for item in best_combination)),
+        "price": best_value,
+        "weight": best_weight
+    }
+
+    print(f"\nBrute-force result for weight limit = {limit}:")
+    return result
+
+
 # Hill climbing solution
 def hill_climbing(array, iterations, limit):
     current = random_solution(array, limit)
@@ -299,6 +329,7 @@ def tabu_search(array, limit, iterations=100, tabu_size=5):
 print(nearest_neighbour(items))
 print(goal(items, weight))
 print(random_solution(items, 5))
+print(brute_force_knapsack(items, 5))
 print(hill_climbing(items, 10, 5))
 print(simulated_annealing(items, 5))
 print(tabu_search(items, 5, iterations=50, tabu_size=5))
