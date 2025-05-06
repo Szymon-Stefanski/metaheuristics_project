@@ -11,17 +11,26 @@ It serves both as a learning exercise in optimization algorithms and as a practi
 - **Custom Algorithm**  
   A handcrafted algorithm based on greedy strategies.
   
+
 - **Random Solution**  
   Generates random feasible solutions to serve as a baseline for comparison.
+
+
+- **Brute-force Search**  
+  Exhaustively checks all possible item combinations to find the optimal solution.  
+  Guarantees the best result, but becomes computationally infeasible for larger item sets due to exponential time complexity.
   
+
 - **Hill Climbing**  
   Starts from an initial solution and iteratively makes small improvements to reach a local optimum.
   
+
 - **Simulated Annealing**
 
   A probabilistic metaheuristic that explores the solution space by occasionally accepting worse solutions, 
   allowing it to escape local optima. Gradually reduces its acceptance rate by lowering a "temperature" 
   parameter over time.
+
 
 - **Tabu Search**  
   A local search metaheuristic that uses memory structures to avoid revisiting recent solutions (tabu list).  
