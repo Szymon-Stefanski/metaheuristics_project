@@ -77,40 +77,7 @@ def goal(array=None, limit=None):
     if array is None:
         no_items(array)
 
-    permuts = array.copy()
-    for i in range(len(permuts)-1):
-        if permuts[i].get("weight") == limit:
-            knapsack.append(permuts[i])
-            permuts.remove(permuts[i])
-            knapsack.sort(key=lambda x: x["price"], reverse=True)
 
-        elif permuts[i].get("weight") < limit:
-            for j in range(len(permuts)):
-                while (permuts[j].get("weight") + permuts[i].get("weight")) <= limit:
-                    if permuts[i].get("name") not in permuts[j].get("name"):
-                        permuts.append({"name" : permuts[i].get("name") + " " + permuts[j].get("name"),
-                                      "price" : permuts[i].get("price") + permuts[j].get("price"),
-                                      "weight" : permuts[i].get("weight") + permuts[j].get("weight")})
-                    break
-
-    permuts.sort(key=lambda x: x["price"], reverse=True)
-
-    for n in range(len(permuts) - 1, -1, -1):
-        permuts[n]['name'] = " ".join(sorted(permuts[n]['name'].split()))
-        if permuts[n].get("weight") != limit:
-            del permuts[n]
-        else:
-            knapsack.append(permuts[n])
-
-    knapsack = [dict(t) for t in {tuple(d.items()) for d in knapsack}]
-    knapsack.sort(key=lambda x: x["price"], reverse=True)
-
-
-    for m in range(len(knapsack) - 1, -1, -1):
-        if knapsack[m].get("price") < knapsack[0].get("price"):
-            del knapsack[m]
-
-    print(f"\nKnapsack best possible items configuration with weight limit = {limit} :")
     return knapsack
 
 
@@ -326,8 +293,9 @@ def tabu_search(array, limit, iterations=100, tabu_size=5):
     return best
 
 
-print(nearest_neighbour(items))
+
 print(goal(items, weight))
+print(nearest_neighbour(items))
 print(random_solution(items, 5))
 print(brute_force_knapsack(items, 5))
 print(hill_climbing(items, 10, 5))
