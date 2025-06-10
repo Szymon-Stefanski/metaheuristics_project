@@ -4,11 +4,11 @@ import math
 import itertools
 
 
-items = [{"name" : "guitar", "price" : 500, "weight" : 3},
-         {"name" : "laptop", "price" : 1000, "weight" : 2},
-         {"name" : "phone", "price" : 500, "weight" : 1},
+items = [{"name" : "watch", "price" : 2000, "weight" : 1},
+         {"name" : "laptop", "price" : 3000, "weight" : 2},
+         {"name" : "phone", "price" : 1500, "weight" : 1},
          {"name" : "tablet", "price" : 1000, "weight" : 1},
-         {"name" : "tv", "price" : 3000, "weight" : 5}]
+         {"name" : "tv", "price" : 15000, "weight" : 5}]
 
 weight = 5
 
@@ -70,6 +70,7 @@ def no_items(array):
 # Knapsack problem solution function
 def goal(array=None, limit=None):
     knapsack = []
+    total_weight = 0
 
     if limit < 0:
         limit = input("Please enter weight limit")
@@ -77,6 +78,12 @@ def goal(array=None, limit=None):
     if array is None:
         no_items(array)
 
+    for i in array:
+        for j in array:
+            if j != i and j["price"] > i["price"]:
+                if j["weight"] <= limit - total_weight and j not in knapsack:
+                    knapsack.append(j)
+                    total_weight += j["weight"]
 
     return knapsack
 
@@ -295,9 +302,9 @@ def tabu_search(array, limit, iterations=100, tabu_size=5):
 
 
 print(goal(items, weight))
-print(nearest_neighbour(items))
-print(random_solution(items, 5))
-print(brute_force_knapsack(items, 5))
-print(hill_climbing(items, 10, 5))
-print(simulated_annealing(items, 5))
-print(tabu_search(items, 5, iterations=50, tabu_size=5))
+#print(nearest_neighbour(items))
+#print(random_solution(items, 5))
+#print(brute_force_knapsack(items, 5))
+#print(hill_climbing(items, 10, 4))
+#print(simulated_annealing(items, 5))
+#print(tabu_search(items, 5, iterations=50, tabu_size=5))
