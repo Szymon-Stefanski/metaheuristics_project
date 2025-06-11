@@ -8,7 +8,7 @@ items = [{"name" : "watch", "price" : 2000, "weight" : 1},
          {"name" : "laptop", "price" : 3000, "weight" : 2},
          {"name" : "phone", "price" : 1500, "weight" : 1},
          {"name" : "tablet", "price" : 1000, "weight" : 1},
-         {"name" : "tv", "price" : 15000, "weight" : 5}]
+         {"name" : "tv", "price" : 5000, "weight" : 5}]
 
 weight = 5
 
@@ -70,7 +70,6 @@ def no_items(array):
 # Knapsack problem solution function
 def goal(array=None, limit=None):
     knapsack = []
-    total_weight = 0
 
     if limit < 0:
         limit = input("Please enter weight limit")
@@ -78,12 +77,16 @@ def goal(array=None, limit=None):
     if array is None:
         no_items(array)
 
-    for i in array:
-        for j in array:
-            if j != i and j["price"] > i["price"]:
-                if j["weight"] <= limit - total_weight and j not in knapsack:
-                    knapsack.append(j)
-                    total_weight += j["weight"]
+    best_value = 0
+
+    for r in range(1, len(array) + 1):
+        for combo in itertools.combinations(array, r):
+            total_weight = sum(array["weight"] for array in combo)
+            total_price = sum(array["price"] for array in combo)
+
+            if total_weight <= limit and total_price > best_value:
+                best_value = total_price
+                knapsack = combo
 
     return knapsack
 
