@@ -96,11 +96,15 @@ def nearest_neighbour(array=None):
     if array is None:
         array = no_items(array)
 
+    if len(array) < 2:
+        return []
+
     neighbours = []
 
     for i in range(len(array)):
         neighbour = array.copy()
-        neighbour[i], neighbour[(i+1) % len(array)] = neighbour[(i+1) % len(array)], neighbour[i]
+        j = (i + 1) % len(array)
+        neighbour[i], neighbour[j] = neighbour[j], neighbour[i]
         neighbours.append(neighbour)
 
     return neighbours
@@ -109,29 +113,22 @@ def nearest_neighbour(array=None):
 # Random solution function
 def random_solution(array, limit):
     if not array:
-        no_items(array)
+        array = no_items(array)
 
     print("\nRandom solution for weight limit =", limit)
 
+    knapsack = []
     total_weight = 0
     total_price = 0
-    selected_names = []
 
     current = array.copy()
     random.shuffle(current)
-
 
     for item in current:
         if total_weight + item["weight"] <= limit:
             total_weight += item["weight"]
             total_price += item["price"]
-            selected_names.append(item["name"])
-
-    knapsack = {
-        "name": " ".join(sorted(selected_names)),
-        "price": total_price,
-        "weight": total_weight
-    }
+            knapsack.append(item)
 
     return knapsack
 
@@ -306,7 +303,7 @@ def tabu_search(array, limit, iterations=100, tabu_size=5):
 
 print(goal(items, weight))
 #print(nearest_neighbour(items))
-#print(random_solution(items, 5))
+print(random_solution(items, 5))
 #print(brute_force_knapsack(items, 5))
 #print(hill_climbing(items, 10, 4))
 #print(simulated_annealing(items, 5))
