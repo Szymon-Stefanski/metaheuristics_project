@@ -6,7 +6,7 @@ import itertools
 
 items = [{"name" : "watch", "price" : 2000, "weight" : 1},
          {"name" : "laptop", "price" : 3000, "weight" : 2},
-         {"name" : "phone", "price" : 1500, "weight" : 1},
+         {"name" : "phone", "price" : 1500, "weight" : 5},
          {"name" : "tablet", "price" : 1000, "weight" : 1},
          {"name" : "tv", "price" : 5000, "weight" : 5}]
 
@@ -134,13 +134,12 @@ def random_solution(array, limit):
 
 
 # Brute force algorithm
-def brute_force_knapsack(array, limit):
+def brute_force(array, limit):
     if not array:
         array = no_items(array)
 
-    best_combination = []
+    knapsack = []
     best_value = 0
-    best_weight = 0
 
     for r in range(1, len(array) + 1):
         for combination in itertools.combinations(array, r):
@@ -149,17 +148,11 @@ def brute_force_knapsack(array, limit):
 
             if total_weight <= limit and total_price > best_value:
                 best_value = total_price
-                best_weight = total_weight
-                best_combination = combination
-
-    result = {
-        "name": " ".join(sorted(item["name"] for item in best_combination)),
-        "price": best_value,
-        "weight": best_weight
-    }
+                knapsack = combination
 
     print(f"\nBrute-force result for weight limit = {limit}:")
-    return result
+
+    return knapsack
 
 
 # Hill climbing solution
@@ -304,7 +297,7 @@ def tabu_search(array, limit, iterations=100, tabu_size=5):
 print(goal(items, weight))
 #print(nearest_neighbour(items))
 print(random_solution(items, 5))
-#print(brute_force_knapsack(items, 5))
+print(brute_force(items, 5))
 #print(hill_climbing(items, 10, 4))
 #print(simulated_annealing(items, 5))
 #print(tabu_search(items, 5, iterations=50, tabu_size=5))
