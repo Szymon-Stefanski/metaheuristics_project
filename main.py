@@ -88,6 +88,8 @@ def goal(array=None, limit=None):
                 best_value = total_price
                 knapsack = combo
 
+    print(f"\nMy solution result for weight limit = {limit}:")
+
     return knapsack
 
 
@@ -107,17 +109,21 @@ def nearest_neighbour(array=None):
         neighbour[i], neighbour[j] = neighbour[j], neighbour[i]
         neighbours.append(neighbour)
 
+    print("\nNearest neighbours:")
+
     return neighbours
 
 
 # Random solution function
 def random_solution(array, limit):
+    knapsack = []
+
+    if limit < 0:
+        limit = input("Please enter weight limit")
+
     if not array:
         array = no_items(array)
 
-    print("\nRandom solution for weight limit =", limit)
-
-    knapsack = []
     total_weight = 0
     total_price = 0
 
@@ -130,15 +136,21 @@ def random_solution(array, limit):
             total_price += item["price"]
             knapsack.append(item)
 
+    print(f"\nRandom solution result for weight limit = {limit}:")
+
     return knapsack
 
 
 # Brute force algorithm
 def brute_force(array, limit):
+    knapsack = []
+
+    if limit < 0:
+        limit = input("Please enter weight limit")
+
     if not array:
         array = no_items(array)
 
-    knapsack = []
     best_value = 0
 
     for r in range(1, len(array) + 1):
@@ -157,10 +169,13 @@ def brute_force(array, limit):
 
 # Hill climbing solution
 def hill_climbing(array, iterations, limit):
+    knapsack = []
+
+    if limit < 0:
+        limit = input("Please enter weight limit")
+
     if not array:
         array = no_items(array)
-
-    knapsack = []
 
     current_items = random_solution(array, limit)
     knapsack = current_items
@@ -195,6 +210,8 @@ def hill_climbing(array, iterations, limit):
         if not improved:
             break
 
+    print(f"\nHill climbing result for weight limit = {limit}:")
+
     return knapsack
 
 
@@ -202,45 +219,46 @@ def hill_climbing(array, iterations, limit):
 
 # Simulated annealing solution
 def simulated_annealing(array, limit, initial_temp=1000, cooling_rate=0.95, min_temp=1):
+    knapsack = []
+
+    if limit < 0:
+        limit = input("Please enter weight limit")
+
     if not array:
         array = no_items(array)
 
-    current = random_solution(array, limit)
-    best = current
+    current_items = random_solution(array, limit)
+    knapsack = current_items
     temperature = initial_temp
 
+    def total_price(items):
+        return sum(item["price"] for item in items)
+
     while temperature > min_temp:
-        neighbour_items = nearest_neighbour(array)
-        next_candidate = random.choice(neighbour_items)
+        neighbours = nearest_neighbour(array)
+        next_candidate = random.choice(neighbours)
 
-        total_weight = 0
-        total_price = 0
-        selected_names = []
-
+        candidate = []
+        w = 0
         for item in next_candidate:
-            if total_weight + item["weight"] <= limit:
-                total_weight += item["weight"]
-                total_price += item["price"]
-                selected_names.append(item["name"])
+            if w + item["weight"] <= limit:
+                w += item["weight"]
+                candidate.append(item)
 
-        candidate_solution = {
-            "name": " ".join(sorted(selected_names)),
-            "price": total_price,
-            "weight": total_weight
-        }
-
-        delta = candidate_solution["price"] - current["price"]
+        delta = total_price(candidate) - total_price(current_items)
 
         if delta > 0 or random.random() < math.exp(delta / temperature):
-            current = candidate_solution
+            current_items = candidate
 
-        if current["price"] > best["price"]:
-            best = current
+        if total_price(current_items) > total_price(knapsack):
+            knapsack = current_items
 
         temperature *= cooling_rate
 
-    print(f"\nSimulated Annealing result for weight limit = {limit}:")
-    return best
+    print(f"\nSimulated annealing result for weight limit = {limit}:")
+
+    return knapsack
+
 
 
 # Tabu Search algorithm
@@ -249,7 +267,7 @@ def tabu_search(array, limit, iterations=100, tabu_size=5):
         array = no_items(array)
 
     current = random_solution(array, limit)
-    best = current
+    knapsack = current
     tabu_list = []
     history = [current]
 
@@ -293,16 +311,16 @@ def tabu_search(array, limit, iterations=100, tabu_size=5):
         history.append(current)
         current = next_solution
 
-        if current["price"] > best["price"]:
-            best = current
+        if current["price"] > knapsack["price"]:
+            knapsack = current
 
     print(f"\nTabu Search result for weight limit = {limit}, tabu size = {tabu_size}:")
-    return best
+    return knapsack
 
 
 
 print(goal(items, weight))
-#print(nearest_neighbour(items))
+print(nearest_neighbour(items))
 print(random_solution(items, 5))
 print(brute_force(items, 5))
 print(hill_climbing(items, 10, 5))
