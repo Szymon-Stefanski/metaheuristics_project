@@ -157,8 +157,20 @@ def brute_force(array, limit):
 
 # Hill climbing solution
 def hill_climbing(array, iterations, limit):
-    current = random_solution(array, limit)
-    best = current
+    if not array:
+        array = no_items(array)
+
+    knapsack = []
+
+    current_items = random_solution(array, limit)
+    knapsack = current_items
+
+    def total_price_weight(items):
+        total_weight = sum(item["weight"] for item in items)
+        total_price = sum(item["price"] for item in items)
+        return total_price, total_weight
+
+    best_price, _ = total_price_weight(knapsack)
 
     for _ in range(iterations):
         neighbours = nearest_neighbour(array)
@@ -167,29 +179,24 @@ def hill_climbing(array, iterations, limit):
         for neighbour in neighbours:
             total_weight = 0
             total_price = 0
-            selected_names = []
+            selected = []
 
             for item in neighbour:
                 if total_weight + item["weight"] <= limit:
                     total_weight += item["weight"]
                     total_price += item["price"]
-                    selected_names.append(item["name"])
+                    selected.append(item)
 
-            neighbour_solution = {
-                "name": " ".join(sorted(selected_names)),
-                "price": total_price,
-                "weight": total_weight
-            }
-
-            if neighbour_solution["price"] > best["price"]:
-                best = neighbour_solution
+            if total_price > best_price:
+                knapsack = selected
+                best_price = total_price
                 improved = True
 
         if not improved:
             break
 
-    print(f"\nHill climbing result for weight limit = {limit}:")
-    return best
+    return knapsack
+
 
 
 
@@ -298,6 +305,6 @@ print(goal(items, weight))
 #print(nearest_neighbour(items))
 print(random_solution(items, 5))
 print(brute_force(items, 5))
-#print(hill_climbing(items, 10, 4))
+print(hill_climbing(items, 10, 5))
 #print(simulated_annealing(items, 5))
 #print(tabu_search(items, 5, iterations=50, tabu_size=5))
