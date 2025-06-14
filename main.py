@@ -263,66 +263,74 @@ def simulated_annealing(array, limit, initial_temp=1000, cooling_rate=0.95, min_
 
 # Tabu Search algorithm
 def tabu_search(array, limit, iterations=100, tabu_size=5):
+    knapsack = []
+
+    if limit < 0:
+        limit = input("Please enter weight limit")
+
     if not array:
         array = no_items(array)
 
-    current = random_solution(array, limit)
-    knapsack = current
+    current_items = random_solution(array, limit)
+    knapsack = current_items
     tabu_list = []
-    history = [current]
+    history = [current_items]
+
+    def get_name_tuple(items):
+        return tuple(sorted(item["name"] for item in items))
+
+    def total_price(items):
+        return sum(item["price"] for item in items)
+
+    def total_weight(items):
+        return sum(item["weight"] for item in items)
 
     for _ in range(iterations):
         neighbours = nearest_neighbour(array)
         candidates = []
 
         for neighbour in neighbours:
-            total_weight = 0
-            total_price = 0
-            selected_names = []
-
+            candidate = []
+            w = 0
             for item in neighbour:
-                if total_weight + item["weight"] <= limit:
-                    total_weight += item["weight"]
-                    total_price += item["price"]
-                    selected_names.append(item["name"])
+                if w + item["weight"] <= limit:
+                    w += item["weight"]
+                    candidate.append(item)
 
-            candidate_solution = {
-                "name": " ".join(sorted(selected_names)),
-                "price": total_price,
-                "weight": total_weight
-            }
-
-            if candidate_solution["name"] not in tabu_list:
-                candidates.append(candidate_solution)
+            name_tuple = get_name_tuple(candidate)
+            if name_tuple not in tabu_list:
+                candidates.append((candidate, name_tuple))
 
         if not candidates:
             if history:
-                current = history.pop()
+                current_items = history.pop()
                 continue
             else:
                 break
 
-        next_solution = max(candidates, key=lambda x: x["price"])
+        next_items, next_name_tuple = max(candidates, key=lambda x: total_price(x[0]))
 
-        tabu_list.append(next_solution["name"])
+        tabu_list.append(next_name_tuple)
         if len(tabu_list) > tabu_size:
             tabu_list.pop(0)
 
-        history.append(current)
-        current = next_solution
+        history.append(current_items)
+        current_items = next_items
 
-        if current["price"] > knapsack["price"]:
-            knapsack = current
+        if total_price(current_items) > total_price(knapsack):
+            knapsack = current_items
 
     print(f"\nTabu Search result for weight limit = {limit}, tabu size = {tabu_size}:")
+
     return knapsack
+
 
 
 
 print(goal(items, weight))
 print(nearest_neighbour(items))
 print(random_solution(items, 5))
-print(brute_force(items, 5))
-print(hill_climbing(items, 10, 5))
+#print(brute_force(items, 5))
+#print(hill_climbing(items, 10, 5))
 #print(simulated_annealing(items, 5))
 #print(tabu_search(items, 5, iterations=50, tabu_size=5))
