@@ -168,7 +168,7 @@ def brute_force(array, limit):
 
 
 # Hill climbing solution
-def hill_climbing(array, iterations, limit):
+def hill_climbing_deterministic(array, iterations, limit):
     knapsack = []
 
     if limit < 0:
@@ -210,11 +210,49 @@ def hill_climbing(array, iterations, limit):
         if not improved:
             break
 
-    print(f"\nHill climbing result for weight limit = {limit}:")
+    print(f"\nHill climbing (deterministic) result for weight limit = {limit}:")
 
     return knapsack
 
 
+
+def hill_climbing_stochastic(array, iterations, limit):
+    knapsack = []
+
+    if limit < 0:
+        limit = int(input("Please enter weight limit: "))
+
+    if not array:
+        array = no_items(array)
+
+    knapsack = random_solution(array, limit)
+
+    def evaluate(solution):
+        total_weight = sum(item["weight"] for item in solution)
+        total_price = sum(item["price"] for item in solution)
+        return total_price, total_weight
+
+    best_price, _ = evaluate(knapsack)
+
+    for _ in range(iterations):
+        neighbours = nearest_neighbour(array)
+        neighbour = random.choice(neighbours)
+
+        selected = []
+        weight = 0
+        price = 0
+        for item in neighbour:
+            if weight + item["weight"] <= limit:
+                weight += item["weight"]
+                price += item["price"]
+                selected.append(item)
+
+        if price > best_price:
+            knapsack = selected
+            best_price = price
+
+    print(f"Hill climbing (stochastic) result for limit = {limit}")
+    return knapsack
 
 
 # Simulated annealing solution
@@ -330,7 +368,8 @@ def tabu_search(array, limit, iterations=100, tabu_size=5):
 print(goal(items, weight))
 print(nearest_neighbour(items))
 print(random_solution(items, 5))
-#print(brute_force(items, 5))
-#print(hill_climbing(items, 10, 5))
+print(brute_force(items, 5))
+print(hill_climbing_deterministic(items, 10, 5))
+print(hill_climbing_stochastic(items, 10, 5))
 #print(simulated_annealing(items, 5))
 #print(tabu_search(items, 5, iterations=50, tabu_size=5))
