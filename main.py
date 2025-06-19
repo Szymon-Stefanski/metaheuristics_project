@@ -71,25 +71,33 @@ def no_items(array):
 def goal(array=None, limit=None):
     knapsack = []
 
-    if limit < 0:
-        limit = input("Please enter weight limit")
+    if limit is None or limit < 0:
+        limit = int(input("Please enter weight limit: "))
 
     if array is None:
-        no_items(array)
+        return []
 
-    best_value = 0
+    permuts = array.copy()
+    candidates = []
 
-    for r in range(1, len(array) + 1):
-        for combo in itertools.combinations(array, r):
-            total_weight = sum(array["weight"] for array in combo)
-            total_price = sum(array["price"] for array in combo)
+    for r in range(1, len(permuts) + 1):
+        for combo in itertools.combinations(permuts, r):
+            total_weight = sum(item["weight"] for item in combo)
+            total_price = sum(item["price"] for item in combo)
+            if total_weight <= limit:
+                candidates.append({
+                    "items": list(combo),
+                    "total_price": total_price,
+                    "total_weight": total_weight
+                })
 
-            if total_weight <= limit and total_price > best_value:
-                best_value = total_price
-                knapsack = combo
+    if candidates:
+        best_price = max(c["total_price"] for c in candidates)
+        best_combinations = [c for c in candidates if c["total_price"] == best_price]
 
-    print(f"\nMy solution result for weight limit = {limit}:")
+        knapsack = best_combinations[0]["items"]
 
+    print(f"\nKnapsack best possible items configuration with weight limit = {limit}:")
     return knapsack
 
 
@@ -366,10 +374,10 @@ def tabu_search(array, limit, iterations=100, tabu_size=5):
 
 
 print(goal(items, weight))
-print(nearest_neighbour(items))
-print(random_solution(items, 5))
-print(brute_force(items, 5))
-print(hill_climbing_deterministic(items, 10, 5))
-print(hill_climbing_stochastic(items, 10, 5))
+#print(nearest_neighbour(items))
+#print(random_solution(items, 5))
+#print(brute_force(items, 5))
+#print(hill_climbing_deterministic(items, 10, 5))
+#print(hill_climbing_stochastic(items, 10, 5))
 #print(simulated_annealing(items, 5))
 #print(tabu_search(items, 5, iterations=50, tabu_size=5))
