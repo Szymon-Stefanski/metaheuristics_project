@@ -4,13 +4,30 @@ import math
 import itertools
 
 
-items = [{"name" : "watch", "price" : 2000, "weight" : 1},
-         {"name" : "laptop", "price" : 3000, "weight" : 2},
-         {"name" : "phone", "price" : 1500, "weight" : 5},
-         {"name" : "tablet", "price" : 1000, "weight" : 1},
-         {"name" : "tv", "price" : 5000, "weight" : 5}]
+items = [
+    {"name": "Laptop", "weight": 3, "price": 4000},
+    {"name": "Smartphone", "weight": 1, "price": 2500},
+    {"name": "Headphones", "weight": 1, "price": 800},
+    {"name": "Camera", "weight": 2, "price": 3200},
+    {"name": "Watch", "weight": 1, "price": 1500},
+    {"name": "Tablet", "weight": 1, "price": 1800},
+    {"name": "Bluetooth Speaker", "weight": 2, "price": 1200},
+    {"name": "Portable Charger", "weight": 1, "price": 600},
+    {"name": "Gaming Console", "weight": 3, "price": 3500},
+    {"name": "E-reader", "weight": 1, "price": 1000},
+    {"name": "External Hard Drive", "weight": 1, "price": 900},
+    {"name": "Smart Glasses", "weight": 1, "price": 2200},
+    {"name": "Fitness Tracker", "weight": 1, "price": 700},
+    {"name": "Drone", "weight": 4, "price": 4500},
+    {"name": "Wireless Mouse", "weight": 1, "price": 300},
+    {"name": "Keyboard", "weight": 2, "price": 1100},
+    {"name": "Microphone", "weight": 1, "price": 1300},
+    {"name": "Action Camera", "weight": 1, "price": 2700},
+    {"name": "VR Headset", "weight": 2, "price": 3800},
+    {"name": "Smart Home Hub", "weight": 1, "price": 1600},
+]
 
-weight = 5
+weight = 4
 
 
 # Function to create array or import from data file function
@@ -387,6 +404,110 @@ def tabu_search(array, limit, iterations=100, tabu_size=5, lp=False):
     return knapsack
 
 
+def fitness(individual, limit):
+    weight = sum(item["weight"] for item in individual)
+    value = sum(item["price"] for item in individual)
+    return value if weight <= limit else 0
+
+def generate_individual(items, limit):
+    random.shuffle(items)
+    individual = []
+    w = 0
+    for item in items:
+        if w + item["weight"] <= limit:
+            individual.append(item)
+            w += item["weight"]
+    return individual
+
+def crossover_one_point(parent1, parent2):
+    point = random.randint(1, min(len(parent1), len(parent2)) - 1)
+    child = parent1[:point] + [item for item in parent2 if item not in parent1[:point]]
+    return child
+
+def crossover_uniform(parent1, parent2):
+    child = []
+    for i in range(max(len(parent1), len(parent2))):
+        if i < len(parent1) and i < len(parent2):
+            chosen = random.choice([parent1[i], parent2[i]])
+        elif i < len(parent1):
+            chosen = parent1[i]
+        elif i < len(parent2):
+            chosen = parent2[i]
+        else:
+            break
+        if chosen not in child:
+            child.append(chosen)
+    return child
+
+def mutate_swap(individual):
+    if len(individual) < 2:
+        return individual
+    i, j = random.sample(range(len(individual)), 2)
+    individual[i], individual[j] = individual[j], individual[i]
+    return individual
+
+def mutate_remove_add(individual, all_items, limit):
+    if individual:
+        individual.pop(random.randrange(len(individual)))
+    items_pool = [item for item in all_items if item not in individual]
+    random.shuffle(items_pool)
+    total_w = sum(i["weight"] for i in individual)
+    for item in items_pool:
+        if total_w + item["weight"] <= limit:
+            individual.append(item)
+            total_w += item["weight"]
+    return individual
+
+
+def genetic_algorithm(array, limit, population_size=20, generations=100, elitism=True):
+    population = [generate_individual(array[:], limit) for _ in range(population_size)]
+    best = max(population, key=lambda ind: fitness(ind, limit))
+    stagnation = 0
+
+    for gen in range(generations):
+        new_population = []
+
+        if elitism:
+            new_population.append(best)
+
+        while len(new_population) < population_size:
+            parents = random.sample(population, 2)
+
+            if random.random() < 0.5:
+                child = crossover_one_point(parents[0], parents[1])
+            else:
+                child = crossover_uniform(parents[0], parents[1])
+
+            if random.random() < 0.5:
+                child = mutate_swap(child)
+            else:
+                child = mutate_remove_add(child, array, limit)
+
+            total_w = sum(item["weight"] for item in child)
+            while total_w > limit:
+                item = random.choice(child)
+                child.remove(item)
+                total_w -= item["weight"]
+
+            new_population.append(child)
+
+        population = new_population
+
+        current_best = max(population, key=lambda ind: fitness(ind, limit))
+
+        if fitness(current_best, limit) > fitness(best, limit):
+            best = current_best
+            stagnation = 0
+        else:
+            stagnation += 1
+            if stagnation >= 10:
+                break
+
+        if fitness(best, limit) == sum(item["price"] for item in array):
+            break
+
+    print(f"\nGenetic algorithm result for weight limit = {limit}:")
+    return best
 
 
 print(goal(items, weight))
