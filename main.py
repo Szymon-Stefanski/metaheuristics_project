@@ -308,14 +308,14 @@ def simulated_annealing(array, limit, initial_temp=1000, cooling_rate=0.95, min_
 
 
 # Tabu Search algorithm
-def tabu_search(array, limit, iterations=100, tabu_size=5):
+def tabu_search(array, limit, iterations=100, tabu_size=5, lp=False):
     knapsack = []
 
-    if limit < 0:
-        limit = input("Please enter weight limit")
+    if limit is None or limit < 0:
+        limit = int(input("Please enter weight limit"))
 
     if not array:
-        array = no_items(array)
+        return []
 
     current_items = random_solution(array, limit)
     knapsack = current_items
@@ -327,9 +327,6 @@ def tabu_search(array, limit, iterations=100, tabu_size=5):
 
     def total_price(items):
         return sum(item["price"] for item in items)
-
-    def total_weight(items):
-        return sum(item["weight"] for item in items)
 
     for _ in range(iterations):
         neighbours = nearest_neighbour(array)
@@ -348,26 +345,45 @@ def tabu_search(array, limit, iterations=100, tabu_size=5):
                 candidates.append((candidate, name_tuple))
 
         if not candidates:
-            if history:
-                current_items = history.pop()
-                continue
+            if lp and history:
+                rollback_found = False
+                while history:
+                    previous = history.pop()
+                    temp_neighbours = nearest_neighbour(previous)
+                    for temp in temp_neighbours:
+                        temp_candidate = []
+                        w = 0
+                        for item in temp:
+                            if w + item["weight"] <= limit:
+                                w += item["weight"]
+                                temp_candidate.append(item)
+
+                        temp_name_tuple = get_name_tuple(temp_candidate)
+                        if temp_name_tuple not in tabu_list:
+                            current_items = previous
+                            rollback_found = True
+                            break
+                    if rollback_found:
+                        break
+                if not rollback_found:
+                    break
             else:
                 break
 
-        next_items, next_name_tuple = max(candidates, key=lambda x: total_price(x[0]))
+        else:
+            next_items, next_name_tuple = max(candidates, key=lambda x: total_price(x[0]))
 
-        tabu_list.append(next_name_tuple)
-        if len(tabu_list) > tabu_size:
-            tabu_list.pop(0)
+            tabu_list.append(next_name_tuple)
+            if len(tabu_list) > tabu_size:
+                tabu_list.pop(0)
 
-        history.append(current_items)
-        current_items = next_items
+            history.append(current_items)
+            current_items = next_items
 
-        if total_price(current_items) > total_price(knapsack):
-            knapsack = current_items
+            if total_price(current_items) > total_price(knapsack):
+                knapsack = current_items
 
-    print(f"\nTabu Search result for weight limit = {limit}, tabu size = {tabu_size}:")
-
+    print(f"\nTabu Search result for weight limit = {limit}, tabu size = {tabu_size}, rollback enabled = {lp}:")
     return knapsack
 
 
