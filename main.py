@@ -92,7 +92,7 @@ def goal(array=None, limit=None):
         limit = int(input("Please enter weight limit: "))
 
     if array is None:
-        return []
+        array = no_items(array)
 
     permuts = array.copy()
     candidates = []
@@ -108,13 +108,16 @@ def goal(array=None, limit=None):
                     "total_weight": total_weight
                 })
 
+    total_weight = 0
+
     if candidates:
         best_price = max(c["total_price"] for c in candidates)
         best_combinations = [c for c in candidates if c["total_price"] == best_price]
-
         knapsack = best_combinations[0]["items"]
+        for i in best_combinations[0]["items"]:
+            total_weight += i["weight"]
 
-    print(f"\nKnapsack best possible items configuration with weight limit = {limit}:")
+    print(f"\nGaol function limit = {limit}, weight = {total_weight}, value = {best_price}:")
     return knapsack
 
 
@@ -135,18 +138,17 @@ def nearest_neighbour(array=None):
         neighbours.append(neighbour)
 
     print("\nNearest neighbours:")
-
     return neighbours
 
 
 # Random solution function
-def random_solution(array, limit):
+def random_solution(array=None, limit=None):
     knapsack = []
 
-    if limit < 0:
-        limit = input("Please enter weight limit")
+    if limit is None or limit < 0:
+        limit = int(input("Please enter weight limit: "))
 
-    if not array:
+    if array is None:
         array = no_items(array)
 
     total_weight = 0
@@ -161,19 +163,18 @@ def random_solution(array, limit):
             total_price += item["price"]
             knapsack.append(item)
 
-    print(f"\nRandom solution result for weight limit = {limit}:")
-
+    print(f"\nRandom solution limit = {limit}, weight = {total_weight}, value = {total_price}:")
     return knapsack
 
 
 # Brute force algorithm
-def brute_force(array, limit):
+def brute_force(array=None, limit=None):
     knapsack = []
 
-    if limit < 0:
-        limit = input("Please enter weight limit")
+    if limit is None or limit < 0:
+        limit = int(input("Please enter weight limit: "))
 
-    if not array:
+    if array is None:
         array = no_items(array)
 
     best_value = 0
@@ -185,22 +186,25 @@ def brute_force(array, limit):
 
             if total_weight <= limit and total_price > best_value:
                 best_value = total_price
+                w = total_weight
                 knapsack = combination
 
-    print(f"\nBrute-force result for weight limit = {limit}:")
-
+    print(f"\nBrute-force limit = {limit}, weight = {w}, value = {best_value}:")
     return knapsack
 
 
 # Hill climbing solution
-def hill_climbing_deterministic(array, iterations, limit):
+def hill_climbing_deterministic(array=None, iterations=None, limit=None):
     knapsack = []
 
-    if limit < 0:
-        limit = input("Please enter weight limit")
+    if limit is None or limit < 0:
+        limit = int(input("Please enter weight limit: "))
 
-    if not array:
+    if array is None:
         array = no_items(array)
+
+    if iterations is None or iterations < 0:
+        iterations = int(input("Please enter number of iterations: "))
 
     current_items = random_solution(array, limit)
     knapsack = current_items
@@ -235,20 +239,22 @@ def hill_climbing_deterministic(array, iterations, limit):
         if not improved:
             break
 
-    print(f"\nHill climbing (deterministic) result for weight limit = {limit}:")
-
+    print(f"\nHill climbing (deterministic) limit = {limit}, weight = {total_weight}, value = {best_price}:")
     return knapsack
 
 
 
-def hill_climbing_stochastic(array, iterations, limit):
+def hill_climbing_stochastic(array=None, iterations=None, limit=None):
     knapsack = []
 
-    if limit < 0:
+    if limit is None or limit < 0:
         limit = int(input("Please enter weight limit: "))
 
-    if not array:
+    if array is None:
         array = no_items(array)
+
+    if iterations is None or iterations < 0:
+        iterations = int(input("Please enter number of iterations: "))
 
     knapsack = random_solution(array, limit)
 
@@ -276,19 +282,28 @@ def hill_climbing_stochastic(array, iterations, limit):
             knapsack = selected
             best_price = price
 
-    print(f"Hill climbing (stochastic) result for limit = {limit}")
+    print(f"Hill climbing (stochastic) limit = {limit}, weight = {weight}, value = {best_price}:")
     return knapsack
 
 
 # Simulated annealing solution
-def simulated_annealing(array, limit, initial_temp=1000, cooling_rate=0.95, min_temp=1):
+def simulated_annealing(array=None, limit=None, initial_temp=None, cooling_rate=None, min_temp=None):
     knapsack = []
 
-    if limit < 0:
-        limit = input("Please enter weight limit")
+    if limit is None or limit < 0:
+        limit = int(input("Please enter weight limit: "))
 
-    if not array:
+    if array is None:
         array = no_items(array)
+
+    if initial_temp is None or initial_temp < 0:
+        initial_temp = int(input("Please enter initial temperature: "))
+
+    if cooling_rate is None or cooling_rate < 0:
+        cooling_rate = int(input("Please enter cooling rate: "))
+
+    if min_temp is None or min_temp < 0:
+        min_temp = int(input("Please enter minimum temperature: "))
 
     current_items = random_solution(array, limit)
     knapsack = current_items
@@ -318,21 +333,26 @@ def simulated_annealing(array, limit, initial_temp=1000, cooling_rate=0.95, min_
 
         temperature *= cooling_rate
 
-    print(f"\nSimulated annealing result for weight limit = {limit}:")
-
+    print(f"\nSimulated annealing limit = {limit}, weight = {w}, value = {total_price(knapsack)}:")
     return knapsack
 
 
 
 # Tabu Search algorithm
-def tabu_search(array, limit, iterations=100, tabu_size=5, lp=False):
+def tabu_search(array=None, limit=None, iterations=None, tabu_size=None, lp=False):
     knapsack = []
 
     if limit is None or limit < 0:
         limit = int(input("Please enter weight limit"))
 
-    if not array:
-        return []
+    if array is None:
+        array = no_items(array)
+
+    if iterations is None or iterations < 0:
+        iterations = int(input("Please enter number of iterations: "))
+
+    if tabu_size is None or tabu_size < 0:
+        tabu_size = int(input("Please enter tabu size: "))
 
     current_items = random_solution(array, limit)
     knapsack = current_items
@@ -400,14 +420,9 @@ def tabu_search(array, limit, iterations=100, tabu_size=5, lp=False):
             if total_price(current_items) > total_price(knapsack):
                 knapsack = current_items
 
-    print(f"\nTabu Search result for weight limit = {limit}, tabu size = {tabu_size}, rollback enabled = {lp}:")
+    print(f"\nTabu Search  limit = {limit}, weight = {w}, value = {total_price(knapsack)} iterations = {iterations}, tabu size = {tabu_size}, rollback enabled = {lp}:")
     return knapsack
 
-
-def fitness(individual, limit):
-    weight = sum(item["weight"] for item in individual)
-    value = sum(item["price"] for item in individual)
-    return value if weight <= limit else 0
 
 def generate_individual(items, limit):
     random.shuffle(items)
@@ -419,10 +434,20 @@ def generate_individual(items, limit):
             w += item["weight"]
     return individual
 
+def fitness(individual, limit):
+    weight = sum(item["weight"] for item in individual)
+    value = sum(item["price"] for item in individual)
+    return value if weight <= limit else 0
+
+
 def crossover_one_point(parent1, parent2):
-    point = random.randint(1, min(len(parent1), len(parent2)) - 1)
+    min_length = min(len(parent1), len(parent2))
+    if min_length < 2:
+        return parent1[:] if random.random() < 0.5 else parent2[:]
+    point = random.randint(1, min_length - 1)
     child = parent1[:point] + [item for item in parent2 if item not in parent1[:point]]
     return child
+
 
 def crossover_uniform(parent1, parent2):
     child = []
@@ -459,7 +484,20 @@ def mutate_remove_add(individual, all_items, limit):
     return individual
 
 
-def genetic_algorithm(array, limit, population_size=20, generations=100, elitism=True):
+def genetic_algorithm(array=None, limit=None, population_size=None, generations=None, elitism=True):
+    if limit is None or limit < 0:
+        limit = int(input("Please enter weight limit"))
+
+    if array is None:
+        array = no_items(array)
+
+    if population_size is None or population_size < 0:
+        population_size = int(input("Please enter population size: "))
+
+    if generations is None or generations < 0:
+        generations = int(input("Please enter number of generations: "))
+
+
     population = [generate_individual(array[:], limit) for _ in range(population_size)]
     best = max(population, key=lambda ind: fitness(ind, limit))
     stagnation = 0
@@ -467,7 +505,7 @@ def genetic_algorithm(array, limit, population_size=20, generations=100, elitism
     for gen in range(generations):
         new_population = []
 
-        if elitism:
+        if elitism == True:
             new_population.append(best)
 
         while len(new_population) < population_size:
@@ -506,15 +544,17 @@ def genetic_algorithm(array, limit, population_size=20, generations=100, elitism
         if fitness(best, limit) == sum(item["price"] for item in array):
             break
 
-    print(f"\nGenetic algorithm result for weight limit = {limit}:")
+    print(f"\nGenetic algorithm limit = {limit}, weight = {total_w}, value = {fitness(best, limit)}, "
+          f"population size = {population_size}, generations = {generations}, elitism = {elitism}:")
     return best
 
 
 print(goal(items, weight))
-#print(nearest_neighbour(items))
-#print(random_solution(items, 5))
-#print(brute_force(items, 5))
-#print(hill_climbing_deterministic(items, 10, 5))
-#print(hill_climbing_stochastic(items, 10, 5))
-#print(simulated_annealing(items, 5))
-#print(tabu_search(items, 5, iterations=50, tabu_size=5))
+print(nearest_neighbour(items))
+print(random_solution(items, weight))
+print(brute_force(items, weight))
+print(hill_climbing_deterministic(items, 20, weight))
+print(hill_climbing_stochastic(items, 20, weight))
+print(simulated_annealing(items, weight, 1000, 0.95, 1))
+print(tabu_search(items, weight, 50, 5))
+print(genetic_algorithm(items, weight, 20, 100, True))
