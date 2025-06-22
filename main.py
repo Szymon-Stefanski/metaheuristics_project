@@ -1,8 +1,81 @@
-import random
 import csv
+import random
 import math
 import itertools
+import argparse
 
+
+def read_items(file):
+    objects = []
+    reader = csv.DictReader(file)
+    for row in reader:
+        objects.append({
+            "name": row["name"],
+            "weight": int(row["weight"]),
+            "price": int(row["price"])
+        })
+    return objects
+
+
+def main():
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument("--alg", type=str, required=True, choices=[
+        "generate_neighbours", "random_solution", "brute_force", "hill_climbing_deterministic", "hill_scholastic",
+        "simulated_annealing", "tabu_search", "genetic_algorithm"
+    ], help="Choose an algorithm")
+
+    # General parameters
+    parser.add_argument("--filename", type=str, required=True, help="Load a CSV file with items")
+    parser.add_argument("--limit", type=int, required=True, help="Limit")
+    parser.add_argument("--iterations", type=int, default=100)
+
+    # Tabu search algorihtm parameters
+    parser.add_argument("--tabu_size", type=int, default=10)
+    parser.add_argument("--rollback", action="store_true")
+
+    # Simulated annealing algorithm parameters
+    parser.add_argument("--temp", type=float, default=100.0)
+    parser.add_argument("--cooling", type=float, default=0.95)
+    parser.add_argument("--min_temp", type=float, default=0.01)
+
+    #Genetic_algorithm parameters
+    parser.add_argument("--population_size", type=int, default=20)
+    parser.add_argument("--generations", type=int, default=100)
+    parser.add_argument("--elitism", action="store_true")
+
+    args = parser.parse_args()
+    with open(args.filename, newline='') as f:
+        items = read_items(f)
+
+    if args.alg == "generate_neighbours":
+        result = generate_neighbours(items)
+        print(f"{result}")
+    elif args.alg == "random_solution":
+        result = random_solution(items, args.limit)
+        print(f"{result}")
+    elif args.alg == "brute_force":
+        result = brute_force(items, args.limit)
+        print(f"{result}")
+    elif args.alg == "hill_climbing_deterministic":
+        result = hill_climbing_deterministic(items, args.iterations, args.limit)
+        print(f"{result}")
+    elif args.alg == "hill_scholastic":
+        result = hill_climbing_stochastic(items, args.iterations, args.limit)
+        print(f"{result}")
+    elif args.alg == "simulated_annealing":
+        result = simulated_annealing(items, args.limit, args.temp, args.cooling, args.min_temp)
+        print(f"{result}")
+    elif args.alg == "tabu_search":
+        result = tabu_search(items, args.limit, args.iterations, args.tabu_size, args.rollback)
+        print(f"{result}")
+    elif args.alg == "genetic_algorithm":
+        result = genetic_algorithm(
+            items, args.limit, args.population_size, args.generations, args.elitism)
+        print(f"{result}")
+    else:
+        print("Unknown algorithm")
+        return
 
 items = [
     {"name": "Laptop", "weight": 3, "price": 4000},
@@ -28,61 +101,6 @@ items = [
 ]
 
 weight = 4
-
-
-# Function to create array or import from data file function
-def no_items(array):
-    if array is None:
-        array = []
-
-    while True:
-        option = input("\nChoose an option:"
-                       "\n0. Import data from a file (.csv)"
-                       "\n1. Add item."
-                       "\n2. Show items."
-                       "\n3. Complete task.\n")
-
-        match option:
-            case "0":
-                bag = []
-                path = input("\nEnter path to file: ")
-                try:
-                    with open(path, "r") as file:
-                        reader = csv.DictReader(file)
-                        for row in reader:
-                            bag.append({
-                                "name": row["name"],
-                                "price": int(row["price"]),
-                                "weight": int(row["weight"]),
-                            })
-                    array.extend(bag)
-                    print("Items successfully imported.")
-                except FileNotFoundError:
-                    print("File not found! Please try again.")
-
-            case "1":
-                name = input("Insert item's name: ")
-                price = input("Insert item's price: ")
-                weight = input("Insert item's weight: ")
-                array.append({"name": name, "price": int(price), "weight": int(weight)})
-
-            case "2":
-                if array:
-                    print("\nCurrent items:")
-                    for item in array:
-                        print(item)
-                else:
-                    print("There are no items!")
-
-            case "3":
-                print("Finished item input.")
-                return array
-
-            case _:
-                print("Invalid option! Please try again.")
-
-    return array
-
 
 # Goal function
 def evaluate_solution(solution, limit):
@@ -431,11 +449,14 @@ def genetic_algorithm(array, limit, population_size, generations, elitism=True):
     return best
 
 
-print(generate_neighbours(items))
-print(random_solution(items, weight))
-print(brute_force(items, weight))
-print(hill_climbing_deterministic(items, 20, weight))
-print(hill_climbing_stochastic(items, 20, weight))
-print(simulated_annealing(items, weight, 1000, 0.95, 1))
-print(tabu_search(items, weight, 50, 5))
-print(genetic_algorithm(items, weight, 20, 100, True))
+if __name__ == "__main__":
+    main()
+
+#print(generate_neighbours(items))
+#print(random_solution(items, weight))
+#print(brute_force(items, weight))
+#print(hill_climbing_deterministic(items, 20, weight))
+#print(hill_climbing_stochastic(items, 20, weight))
+#print(simulated_annealing(items, weight, 1000, 0.95, 1))
+#print(tabu_search(items, weight, 50, 5))
+#print(genetic_algorithm(items, weight, 20, 100, True))

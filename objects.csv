@@ -1,4 +1,21 @@
-name,price,weight
-laptop,3000,1
-phone,1000,1
-guitar,800,3
+name,weight,price
+Laptop,3,4000
+Smartphone,1,2500
+Headphones,1,800
+Camera,2,3200
+Watch,1,1500
+Tablet,1,1800
+Bluetooth Speaker,2,1200
+Portable Charger,1,600
+Gaming Console,3,3500
+E-reader,1,1000
+External Hard Drive,1,900
+Smart Glasses,1,2200
+Fitness Tracker,1,700
+Drone,4,4500
+Wireless Mouse,1,300
+Keyboard,2,1100
+Microphone,1,1300
+Action Camera,1,2700
+VR Headset,2,3800
+Smart Home Hub,1,1600
