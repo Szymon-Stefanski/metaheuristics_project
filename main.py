@@ -147,7 +147,7 @@ def random_solution(array, limit):
 
 
 # Brute force algorithm
-def brute_force(array=None, limit=None):
+def brute_force(array, limit):
     knapsack = []
 
     best_value = 0
