@@ -21,8 +21,8 @@ def main():
     parser = argparse.ArgumentParser()
 
     parser.add_argument("--alg", type=str, required=True, choices=[
-        "generate_neighbours", "random_solution", "brute_force", "hill_climbing_deterministic", "hill_scholastic",
-        "simulated_annealing", "tabu_search", "genetic_algorithm"
+        "generate_neighbours", "random_solution", "brute_force", "hill_climbing_deterministic",
+        "hill_climbing_stochastic", "simulated_annealing", "tabu_search", "genetic_algorithm"
     ], help="Choose an algorithm")
 
     # General parameters
@@ -60,7 +60,7 @@ def main():
     elif args.alg == "hill_climbing_deterministic":
         result = hill_climbing_deterministic(items, args.iterations, args.limit)
         print(f"{result}")
-    elif args.alg == "hill_scholastic":
+    elif args.alg == "hill_stochastic":
         result = hill_climbing_stochastic(items, args.iterations, args.limit)
         print(f"{result}")
     elif args.alg == "simulated_annealing":
