@@ -30,7 +30,7 @@ def main():
     parser.add_argument("--limit", type=int, required=True, help="Limit")
     parser.add_argument("--iterations", type=int, default=100)
 
-    # Tabu search algorihtm parameters
+    # Tabu search algorithm parameters
     parser.add_argument("--tabu_size", type=int, default=10)
     parser.add_argument("--rollback", action="store_true")
 
@@ -39,7 +39,7 @@ def main():
     parser.add_argument("--cooling", type=float, default=0.95)
     parser.add_argument("--min_temp", type=float, default=0.01)
 
-    #Genetic_algorithm parameters
+    # Genetic algorithm parameters
     parser.add_argument("--population_size", type=int, default=20)
     parser.add_argument("--generations", type=int, default=100)
     parser.add_argument("--elitism", action="store_true")
@@ -227,7 +227,7 @@ def hill_climbing_stochastic(array, iterations, limit):
     return knapsack
 
 
-
+# Simulated annealing algorithm
 def simulated_annealing(array, limit, initial_temp, cooling_rate, min_temp):
     current_solution = random_solution(array, limit)
     best_solution = current_solution[:]
