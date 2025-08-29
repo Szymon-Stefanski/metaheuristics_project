@@ -1,0 +1,105 @@
+def generate_individual(items, limit):
+    random.shuffle(items)
+    individual = []
+    w = 0
+    for item in items:
+        if w + item["weight"] <= limit:
+            individual.append(item)
+            w += item["weight"]
+    return individual
+
+def crossover_one_point(parent1, parent2):
+    min_length = min(len(parent1), len(parent2))
+    if min_length < 2:
+        return parent1[:] if random.random() < 0.5 else parent2[:]
+    point = random.randint(1, min_length - 1)
+    child = parent1[:point] + [item for item in parent2 if item not in parent1[:point]]
+    return child
+
+def crossover_uniform(parent1, parent2):
+    child = []
+    for i in range(max(len(parent1), len(parent2))):
+        if i < len(parent1) and i < len(parent2):
+            chosen = random.choice([parent1[i], parent2[i]])
+        elif i < len(parent1):
+            chosen = parent1[i]
+        elif i < len(parent2):
+            chosen = parent2[i]
+        else:
+            break
+        if chosen not in child:
+            child.append(chosen)
+    return child
+
+def mutate_swap(individual):
+    if len(individual) < 2:
+        return individual
+    i, j = random.sample(range(len(individual)), 2)
+    individual[i], individual[j] = individual[j], individual[i]
+    return individual
+
+def mutate_remove_add(individual, all_items, limit):
+    if individual:
+        individual.pop(random.randrange(len(individual)))
+    items_pool = [item for item in all_items if item not in individual]
+    random.shuffle(items_pool)
+    total_w = sum(i["weight"] for i in individual)
+    for item in items_pool:
+        if total_w + item["weight"] <= limit:
+            individual.append(item)
+            total_w += item["weight"]
+    return individual
+
+def genetic_algorithm(array, limit, population_size, generations, elitism=True):
+    population = [generate_individual(array[:], limit) for _ in range(population_size)]
+    best = max(population, key=lambda ind: evaluate_solution(ind, limit))
+    stagnation = 0
+
+    for gen in range(generations):
+        new_population = []
+
+        if elitism == True:
+            new_population.append(best)
+
+        while len(new_population) < population_size:
+            parents = random.sample(population, 2)
+
+            if random.random() < 0.5:
+                child = crossover_one_point(parents[0], parents[1])
+            else:
+                child = crossover_uniform(parents[0], parents[1])
+
+            if random.random() < 0.5:
+                child = mutate_swap(child)
+            else:
+                child = mutate_remove_add(child, array, limit)
+
+            total_w = sum(item["weight"] for item in child)
+            while total_w > limit:
+                item = random.choice(child)
+                child.remove(item)
+                total_w -= item["weight"]
+
+            new_population.append(child)
+
+        population = new_population
+
+        current_best = max(population, key=lambda ind: evaluate_solution(ind, limit))
+
+        if evaluate_solution(current_best, limit) > evaluate_solution(best, limit):
+            best = current_best
+            stagnation = 0
+        else:
+            stagnation += 1
+            if stagnation >= 10:
+                break
+
+        if evaluate_solution(best, limit) == sum(item["price"] for item in array):
+            break
+
+        items_price, _ = evaluate_solution(best, limit)
+
+    print(f"\nGenetic algorithm limit = {limit}, weight = {weight}, value = {items_price}, "
+          f"population size = {population_size}, generations = {generations}, elitism = {elitism}:")
+    return best
+    
