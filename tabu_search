@@ -1,0 +1,72 @@
+def tabu_search(array, limit, iterations, tabu_size, lp=False):
+    def get_name_tuple(items):
+        return tuple(sorted(item["name"] for item in items))
+
+    current_items = random_solution(array, limit)
+    knapsack = current_items
+    tabu_list = []
+    history = [current_items]
+
+    best_value, best_weight = evaluate_solution(knapsack, limit)
+
+    for _ in range(iterations):
+        neighbours = generate_neighbours(array)
+        candidates = []
+
+        for neighbour in neighbours:
+            candidate = []
+            total_weight = 0
+            for item in neighbour:
+                if total_weight + item["weight"] <= limit:
+                    candidate.append(item)
+                    total_weight += item["weight"]
+
+            value, weight = evaluate_solution(candidate, limit)
+            name_tuple = get_name_tuple(candidate)
+
+            if name_tuple not in tabu_list:
+                candidates.append((candidate, name_tuple, value, weight))
+
+        if not candidates:
+            if lp and history:
+                rollback_found = False
+                while history:
+                    previous = history.pop()
+                    temp_neighbours = generate_neighbours(previous)
+                    for temp in temp_neighbours:
+                        temp_candidate = []
+                        temp_weight = 0
+                        for item in temp:
+                            if temp_weight + item["weight"] <= limit:
+                                temp_candidate.append(item)
+                                temp_weight += item["weight"]
+
+                        temp_value, temp_weight = evaluate_solution(temp_candidate, limit)
+                        temp_name_tuple = get_name_tuple(temp_candidate)
+                        if temp_name_tuple not in tabu_list:
+                            current_items = previous
+                            rollback_found = True
+                            break
+                    if rollback_found:
+                        break
+                if not rollback_found:
+                    break
+            else:
+                break
+        else:
+            next_items, next_name_tuple, next_value, next_weight = max(candidates, key=lambda x: x[2])
+
+            tabu_list.append(next_name_tuple)
+            if len(tabu_list) > tabu_size:
+                tabu_list.pop(0)
+
+            history.append(current_items)
+            current_items = next_items
+
+            if next_value > best_value:
+                knapsack = next_items
+                best_value = next_value
+                best_weight = next_weight
+
+    print(f"\nTabu Search limit = {limit}, weight = {best_weight}, value = {best_value}, iterations = {iterations}, tabu size = {tabu_size}, rollback enabled = {lp}:")
+    return knapsack
