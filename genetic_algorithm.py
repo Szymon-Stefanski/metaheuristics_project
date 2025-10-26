@@ -1,12 +1,18 @@
+import random
+from utils import evaluate_solution
+
+
 def generate_individual(items, limit):
-    random.shuffle(items)
+    items_copy = items[:]
+    random.shuffle(items_copy)
     individual = []
     w = 0
-    for item in items:
+    for item in items_copy:
         if w + item["weight"] <= limit:
             individual.append(item)
             w += item["weight"]
     return individual
+
 
 def crossover_one_point(parent1, parent2):
     min_length = min(len(parent1), len(parent2))
@@ -15,6 +21,7 @@ def crossover_one_point(parent1, parent2):
     point = random.randint(1, min_length - 1)
     child = parent1[:point] + [item for item in parent2 if item not in parent1[:point]]
     return child
+
 
 def crossover_uniform(parent1, parent2):
     child = []
@@ -31,12 +38,14 @@ def crossover_uniform(parent1, parent2):
             child.append(chosen)
     return child
 
+
 def mutate_swap(individual):
     if len(individual) < 2:
         return individual
     i, j = random.sample(range(len(individual)), 2)
     individual[i], individual[j] = individual[j], individual[i]
     return individual
+
 
 def mutate_remove_add(individual, all_items, limit):
     if individual:
@@ -50,15 +59,16 @@ def mutate_remove_add(individual, all_items, limit):
             total_w += item["weight"]
     return individual
 
+
 def genetic_algorithm(array, limit, population_size, generations, elitism=True):
-    population = [generate_individual(array[:], limit) for _ in range(population_size)]
-    best = max(population, key=lambda ind: evaluate_solution(ind, limit))
+    population = [generate_individual(array, limit) for _ in range(population_size)]
+    best = max(population, key=lambda ind: evaluate_solution(ind, limit)[0])
     stagnation = 0
 
     for gen in range(generations):
         new_population = []
 
-        if elitism == True:
+        if elitism:
             new_population.append(best)
 
         while len(new_population) < population_size:
@@ -84,9 +94,9 @@ def genetic_algorithm(array, limit, population_size, generations, elitism=True):
 
         population = new_population
 
-        current_best = max(population, key=lambda ind: evaluate_solution(ind, limit))
+        current_best = max(population, key=lambda ind: evaluate_solution(ind, limit)[0])
 
-        if evaluate_solution(current_best, limit) > evaluate_solution(best, limit):
+        if evaluate_solution(current_best, limit)[0] > evaluate_solution(best, limit)[0]:
             best = current_best
             stagnation = 0
         else:
@@ -94,12 +104,11 @@ def genetic_algorithm(array, limit, population_size, generations, elitism=True):
             if stagnation >= 10:
                 break
 
-        if evaluate_solution(best, limit) == sum(item["price"] for item in array):
+        if evaluate_solution(best, limit)[0] == sum(item["price"] for item in array):
             break
 
-        items_price, _ = evaluate_solution(best, limit)
+    best_value, best_weight = evaluate_solution(best, limit)
 
-    print(f"\nGenetic algorithm limit = {limit}, weight = {weight}, value = {items_price}, "
+    print(f"\nGenetic algorithm limit = {limit}, weight = {best_weight}, value = {best_value}, "
           f"population size = {population_size}, generations = {generations}, elitism = {elitism}:")
     return best
-    

@@ -1,3 +1,6 @@
+from utils import random_solution, evaluate_solution, generate_neighbours
+
+
 def hill_climbing_deterministic(array, iterations, limit):
     knapsack = random_solution(array, limit)
     best_score, best_weight = evaluate_solution(knapsack, limit)

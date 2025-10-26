@@ -1,4 +1,7 @@
 # Goal function
+from random import random
+
+
 def evaluate_solution(solution, limit):
     total_weight = sum(item["weight"] for item in solution)
     total_price = sum(item["price"] for item in solution)

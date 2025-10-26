@@ -1,3 +1,6 @@
+from utils import random_solution, evaluate_solution, generate_neighbours
+
+
 def tabu_search(array, limit, iterations, tabu_size, lp=False):
     def get_name_tuple(items):
         return tuple(sorted(item["name"] for item in items))

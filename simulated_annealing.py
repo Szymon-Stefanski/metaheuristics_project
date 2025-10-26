@@ -1,3 +1,9 @@
+import math
+from random import random
+
+from utils import random_solution, evaluate_solution, generate_neighbours
+
+
 def simulated_annealing(array, limit, initial_temp, cooling_rate, min_temp):
     current_solution = random_solution(array, limit)
     best_solution = current_solution[:]

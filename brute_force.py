@@ -1,3 +1,8 @@
+import itertools
+
+from utils import evaluate_solution
+
+
 def brute_force(array, limit):
     knapsack = []
 
